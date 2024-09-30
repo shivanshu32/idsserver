@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const servercallbackSchema = new mongoose.Schema({
     
     entireresponse: {
-        type: Object
+        type: String
     },
 
     createdOn: {

@@ -15,6 +15,7 @@ const crypto = require('crypto');
 
 const Uicallback = require("./models/uicallback")
 const Servercallback = require("./models/servercallback")
+const Statuscheck = require("./models/statuscheck")
 
 
 dotenv.config();
@@ -145,7 +146,7 @@ app.post("/servercallback", async(req, res) => {
   //console.log("in server callback")
 
 
-  const entireresponse = req.body
+  const entireresponse = req.body.response
 
   const servercallbackdata = new Servercallback({
     entireresponse
@@ -223,6 +224,7 @@ const options = {
 
 
   axios.request(options).then(function (response) {
+
       if (response.data.success === true) {
           const url = `http://localhost:5173/paymentstatus/success/${transactionId}`
           return res.redirect(url)
