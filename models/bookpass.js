@@ -30,6 +30,18 @@ const bookpassSchema = new mongoose.Schema({
         default: Date.now,
         unique: false,
       },  
+      quantity: {
+        type: Number,
+        required: true
+      }, 
+      price: {
+        type: Number,
+        required: true
+      }, 
+      paymentstatus: {
+        type: String,
+        default: "init"
+      }, 
    
 });
 

@@ -26,7 +26,9 @@ exports.passRegister = async (req, res) => {
     email,
     phone,
     occupation,
-    showid
+    showid,
+    quantity,
+    price
   } = req.body;
 
   try {
@@ -46,7 +48,9 @@ exports.passRegister = async (req, res) => {
     phone,
     occupation,
     showid,
-    merchanttxnid 
+    merchanttxnid,
+    quantity,
+    price 
   });
 
   await newPass.save();
@@ -61,21 +65,22 @@ exports.passRegister = async (req, res) => {
       },
   });
 
-    // Send email
-    // let info = await transporter.sendMail({
-    //   to: "shivanshu@abscod.com",
-    //   from: "info@indiadesignershow.com",
-    //   subject: "IDS Pass Registration",
-    //   html: `
-    //     <h3>Registration for Pass, Payment Pending</h3>
-    //     <ul>
-    //       <li><p>Name : ${name} </p></li>
-    //       <li><p>Email : ${email}</p></li>
-    //       <li><p>Phone : ${phone}</p></li>
-    //       <li><p>Occupation : ${occupation}</p></li>
+   // Send email
+    let info = await transporter.sendMail({
+      to: "shivanshu@abscod.com",
+      from: "info@indiadesignershow.com",
+      subject: "IDS Pass Registration",
+      html: `
+        <h3>Registration for Pass, Payment Pending</h3>
+        <ul>
+          <li><p>Name : ${name} </p></li>
+          <li><p>Email : ${email}</p></li>
+          <li><p>Phone : ${phone}</p></li>
+          <li><p>Occupation : ${occupation}</p></li>
+           
          
-    //     </ul>`,
-    // });
+        </ul>`,
+    });
 
     res.status(201).json({ message: merchanttxnid });
   } catch (error) {
