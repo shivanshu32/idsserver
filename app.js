@@ -11,11 +11,15 @@ const evenRegistration = require("./routes/eventRegistration");
 const axios = require('axios');
 const sha256 = require('sha256');
 const crypto = require('crypto');
+const nodemailer = require("nodemailer");
 
 
 const Uicallback = require("./models/uicallback")
 const Servercallback = require("./models/servercallback")
 const Statuscheck = require("./models/statuscheck")
+const Transactionmaster = require("./models/transactionmaster")
+const Passregister = require("./models/bookpass")
+const Passmaster = require("./models/passmaster")
 
 
 dotenv.config();
@@ -54,22 +58,85 @@ app.get("/", (req, res) => {
   res.status(200).json("API Connected");
 });
 
-  //const PHONEPE_HOST_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay"
-  const PHONEPE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay"
-  const MERCHANT_ID = "PGTESTPAYUAT86" //  TESTING
-  //const MERCHANT_ID = "INDIAMONLINE" //  PRODUCTION
+  const PHONEPE_HOST_URL = "https://api.phonepe.com/apis/hermes/pg/v1/pay"
+  //const PHONEPE_HOST_URL = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay"
+  //const MERCHANT_ID = "PGTESTPAYUAT86" //  TESTING
+  const MERCHANT_ID = "INDIAMONLINE" //  PRODUCTION
   const SALT_INDEX = '1'
-  const SALT_KEY = "96434309-7796-489d-8924-ab56988a6076"  //TESTING
-  //const SALT_KEY = "aa9ce227-5204-4bfe-a8ae-6ad40ec768f8"  //PRODUCTION
+  //const SALT_KEY = "96434309-7796-489d-8924-ab56988a6076"  //TESTING
+  const SALT_KEY = "aa9ce227-5204-4bfe-a8ae-6ad40ec768f8"  //PRODUCTION
   const PAY_ENDPOINT = '/pg/v1/pay'
 
+const storefinalresponse = async(response) => {
+  const entireresponse = response
+ // console.log("in storefinal respnse")
+ // console.log(response)
+ // console.log(typeof(response))
+
+  const statuscheckdata = new Statuscheck({
+    entireresponse
+  })
+ await statuscheckdata.save()
+ return response;
+
+}
+
+const sendpassmail = async (topassurl,finalemail) => {
+        // Set up email transporter
+        let transporter = nodemailer.createTransport({
+          host: "smtp-relay.brevo.com",
+          port: 587,
+          secure: false,
+          auth: {
+            user: process.env.BREEVO_ID,
+            pass: process.env.BREEVO_PASS,
+          },
+      });
+      
+       // Send email
+        let info = await transporter.sendMail({
+          to: finalemail,
+          cc: "shivanshu@abscod.com,info@indiadesignershow.com",
+          from: "info@indiadesignershow.com",
+          subject: "Your IDS Season 5 Pass.",
+          html: `
+            <h3>Thank you for booking passes. <a href="${topassurl}">Click here</a> to download your passes</h3>
+           
+               
+             
+            `,
+        });
+}
+
+{/* <ul>
+<li><p>Name : ${name} </p></li>
+<li><p>Email : ${email}</p></li>
+<li><p>Phone : ${phone}</p></li>
+<li><p>Occupation : ${occupation}</p></li>
+</ul> */}
 
 // Payment API route
-app.post("/paynow", (req, res) => {
+app.post("/paynow", async(req, res) => {
   const {
-    price,
-    merchanttxnid
+    totalprice,
+    merchanttxnid,
+    quantity,
+    showid,
+    cost
   } = req.body;
+
+  const transactionmasterdata = new Transactionmaster({
+    showid,
+    merchanttxnid,
+    quantity,
+    cost,
+    totalprice
+
+  })
+
+  await transactionmasterdata.save()
+
+
 
 
 
@@ -78,8 +145,8 @@ const payload =
 	"merchantId": MERCHANT_ID, 
 	"merchantTransactionId": merchanttxnid, // String Mandatory
 	"merchantUserId": "unknowg8835", // String Mandatory - used for auto login.
-  "amount": price,
-  "redirectUrl": `http://localhost:8800/paystatus`,
+  "amount": totalprice,
+  "redirectUrl": `https://idsserver-app-tk64n.ondigitalocean.app/paystatus`,
   //"redirectUrl": `http://localhost:8800/paystatus?id=${merchanttxnid}`,
   "redirectMode": "POST",
   "callbackUrl": "https://idsserver-app-tk64n.ondigitalocean.app/servercallback",
@@ -174,7 +241,36 @@ res.status(200).json({message:"success is"});
 
 });
 
+// console.log(txnid)
+
+app.get('/getpassdetails', async(req,res) => {
+  const txnid = req.query.txnid;
+  console.log("in get pass detail")
+  console.log(txnid)
+
+  Passmaster.find(
+    { finalmerchanttxnid: txnid },  // Query parameter 
+  )
+  .then(
+    (data)=>{
+
+   
+      
+          res.status(200).send(
+              data,
+            );
+  
+
+
+  }
+  )
+  
+  //res.status(200).json(txnid);
+
+})
+
 app.post('/paystatus', async (req, res) => {
+
 
 const {
 code,
@@ -213,7 +309,8 @@ entireresponse
 
 const options = {
       method: 'GET',
-      url: `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${merchantId}/${transactionId}`,
+      // url: `https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/${merchantId}/${transactionId}`,
+      url: `https://api.phonepe.com/apis/hermes/pg/v1/pay/pg/v1/status/${merchantId}/${transactionId}`,
       headers: {
           accept: 'application/json',
           'Content-Type': 'application/json',
@@ -223,13 +320,120 @@ const options = {
   }
 
 
-  axios.request(options).then(function (response) {
+  axios.request(options).then(function(response) {
+
+
+  storefinalresponse(response.data)
+
+    
+
 
       if (response.data.success === true) {
-          const url = `http://localhost:5173/paymentstatus/success/${transactionId}`
-          return res.redirect(url)
+
+
+        Transactionmaster.updateOne(
+          { merchanttxnid: transactionId },  // Query parameter 
+    { $set: { paymentstatus: "complete" } }     // Update operation
+        ).then(
+function(){
+
+
+  Transactionmaster.findOne(
+    { merchanttxnid: transactionId },  // Query parameter 
+  )
+  .then((result)=>{
+   
+
+   const finalshowid = result.showid
+   const finalmerchanttxnid = result.merchanttxnid
+   const finalquantity = result.quantity
+   const finaltotalprice = result.totalprice
+   const finalcost = result.cost
+
+  //  console.log(finalpassshowid)
+  //  console.log(finalpassmerchanttxnid)
+  //  console.log(finalpassquantity)
+  //  console.log(finalpasstotalprice)
+  //  console.log(finalpasscost)
+
+   Passregister.findOne(
+    { merchanttxnid: transactionId },
+   )
+   .then((result) =>{
+
+    console.log("result is")
+    console.log(result)
+
+    const finalname = result.name
+    const finalemail = result.email
+    const finalphone = result.phone
+    const finaloccupation = result.occupation
+
+    const quantitycounter = Number(finalquantity)
+
+    for (let i = 0; i < quantitycounter; i++) {
+      const finalpassid = i + "o" + quantitycounter + finalmerchanttxnid
+
+      const passmasterdata = new Passmaster({
+      
+        finalshowid,
+        finalmerchanttxnid ,
+        finalquantity ,
+        finaltotalprice ,
+        finalcost ,
+        finalname ,
+        finalemail ,
+        finalphone ,
+        finaloccupation,
+        finalpassid
+        })
+
+        passmasterdata.save()
+        .then(()=>{
+          const topassurl = "https://www.indiadesignershow.com/Epass/" + finalmerchanttxnid
+          sendpassmail(topassurl,finalemail)
+
+        })
+
+
+      
+       
+
+  
+
+
+
+
+    }
+
+   
+
+    //const url = `http://localhost:5173/paymentstatus/success/${transactionId}`
+    const url = `https://www.indiadesignershow.com/paymentstatus/success/${transactionId}`
+    return res.redirect(url)
+
+   })
+
+
+
+
+  })
+
+  //find registration details
+  //find transaction details
+  //generate ticketid for each quantity and insert to passmaster
+
+
+ 
+}
+        )
+
+
+
+          
       } else {
-          const url = `http://localhost:5173/paymentstatus/failed/${transactionId}`
+          const url = `https://www.indiadesignershow.com/paymentstatus/failed/${transactionId}`
+       //   const url = `http://localhost:5173/paymentstatus/failed/${transactionId}`
           return res.redirect(url)
       }
 

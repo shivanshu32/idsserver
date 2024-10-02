@@ -55,32 +55,32 @@ exports.passRegister = async (req, res) => {
 
   await newPass.save();
 // Set up email transporter
-  let transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.BREEVO_ID,
-        pass: process.env.BREEVO_PASS,
-      },
-  });
+  // let transporter = nodemailer.createTransport({
+  //     host: "smtp-relay.brevo.com",
+  //     port: 587,
+  //     secure: false,
+  //     auth: {
+  //       user: process.env.BREEVO_ID,
+  //       pass: process.env.BREEVO_PASS,
+  //     },
+  // });
 
    // Send email
-    let info = await transporter.sendMail({
-      to: "shivanshu@abscod.com",
-      from: "info@indiadesignershow.com",
-      subject: "IDS Pass Registration",
-      html: `
-        <h3>Registration for Pass, Payment Pending</h3>
-        <ul>
-          <li><p>Name : ${name} </p></li>
-          <li><p>Email : ${email}</p></li>
-          <li><p>Phone : ${phone}</p></li>
-          <li><p>Occupation : ${occupation}</p></li>
+    // let info = await transporter.sendMail({
+    //   to: "shivanshu@abscod.com",
+    //   from: "info@indiadesignershow.com",
+    //   subject: "IDS Pass Registration",
+    //   html: `
+    //     <h3>Registration for Pass, Payment Pending</h3>
+    //     <ul>
+    //       <li><p>Name : ${name} </p></li>
+    //       <li><p>Email : ${email}</p></li>
+    //       <li><p>Phone : ${phone}</p></li>
+    //       <li><p>Occupation : ${occupation}</p></li>
            
          
-        </ul>`,
-    });
+    //     </ul>`,
+    // });
 
     res.status(201).json({ message: merchanttxnid });
   } catch (error) {

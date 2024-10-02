@@ -1,22 +1,7 @@
 const mongoose = require('mongoose');
 
-const bookpassSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true
-    },
-    phone: {
-        type: String,
-       required: true
-    },
-    occupation: {
-        type: String,
-        required: true
-    },
+const transactionmasterSchema = new mongoose.Schema({
+    
     showid: {
         type: String,
         required: true
@@ -35,17 +20,21 @@ const bookpassSchema = new mongoose.Schema({
         type: Number,
         required: true
       }, 
-      price: {
+      totalprice: {
+        type: Number,
+        required: true
+      }, 
+      cost: {
         type: Number,
         required: true
       }, 
       paymentstatus: {
         type: String,
-        default: "init"
+        default: "start"
       }, 
    
 });
 
-const Bookpass = mongoose.model('Bookpass', bookpassSchema);
+const Transactionmaster = mongoose.model('Transactionmaster', transactionmasterSchema);
 
-module.exports = Bookpass;
+module.exports = Transactionmaster;
