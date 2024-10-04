@@ -146,7 +146,7 @@ const payload =
 	"merchantTransactionId": merchanttxnid, // String Mandatory
 	"merchantUserId": "unknowg8835", // String Mandatory - used for auto login.
   "amount": totalprice,
-  "redirectUrl": `https://idsserver-app-tk64n.ondigitalocean.app/paystatus`,
+  "redirectUrl": `https://idsserver-app-tk64n.ondigitalocean.app/paystatus?id=${merchanttxnid}`,
   //"redirectUrl": `http://localhost:8800/paystatus?id=${merchanttxnid}`,
   "redirectMode": "POST",
   "callbackUrl": "https://idsserver-app-tk64n.ondigitalocean.app/servercallback",
