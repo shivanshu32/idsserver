@@ -82,30 +82,67 @@ const storefinalresponse = async(response) => {
 }
 
 const sendpassmail = async (topassurl,finalemail) => {
+
+
+      // Create a transporter object using Gmail SMTP
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+
+// Email options
+
+
+const mailOptions = {
+  to: finalemail,
+  from: process.env.EMAIL_USER,
+  subject: "Your IDS Season 5 Pass.",
+  html: `
+    <h3>Thank you for booking passes. <a href="${topassurl}">Click here</a> to download your passes</h3>
+   
+       
+     
+    `,
+}
+
+// Send the email
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    console.error('❌ Error:', error.message);
+  } else {
+    console.log('✅ Email sent:', info.response);
+  }
+});
+
+
+
         // Set up email transporter
-        let transporter = nodemailer.createTransport({
-          host: "smtp-relay.brevo.com",
-          port: 587,
-          secure: false,
-          auth: {
-            user: process.env.BREEVO_ID,
-            pass: process.env.BREEVO_PASS,
-          },
-      });
+      //   let transporter = nodemailer.createTransport({
+      //     host: "smtp-relay.brevo.com",
+      //     port: 587,
+      //     secure: false,
+      //     auth: {
+      //       user: process.env.BREEVO_ID,
+      //       pass: process.env.BREEVO_PASS,
+      //     },
+      // });
       
        // Send email
-        let info = await transporter.sendMail({
-          to: finalemail,
-          cc: "shivanshu@abscod.com,info@indiadesignershow.com",
-          from: "info@indiadesignershow.com",
-          subject: "Your IDS Season 5 Pass.",
-          html: `
-            <h3>Thank you for booking passes. <a href="${topassurl}">Click here</a> to download your passes</h3>
+        // let info = await transporter.sendMail({
+        //   to: finalemail,
+        //   cc: "shivanshu@abscod.com,info@indiadesignershow.com",
+        //   from: "info@indiadesignershow.com",
+        //   subject: "Your IDS Season 5 Pass.",
+        //   html: `
+        //     <h3>Thank you for booking passes. <a href="${topassurl}">Click here</a> to download your passes</h3>
            
                
              
-            `,
-        });
+        //     `,
+        // });
 }
 
 {/* <ul>
