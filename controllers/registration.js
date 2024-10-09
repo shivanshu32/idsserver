@@ -188,34 +188,75 @@ exports.designerRegister = async (req, res) => {
 
     await newDesigner.save();
 
-    // Set up email transporter
-    let transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.BREEVO_ID,
-        pass: process.env.BREEVO_PASS,
-      },
-    });
 
-    let info = await transporter.sendMail({
-      to: "info@indiadesignershow.com",
-      from: "info@indiadesignershow.com",
-      subject: "IDS Designer Registration",
-      html: `
-        <h3>Designer Details</h3>
-        <ul>
-          <li><p>Name : ${fullname} </p></li>
-          <li><p>Email : ${email}</p></li>
-          <li><p>Phone : ${phone}</p></li>
-          <li><p>Location : ${location}</p></li>
-          <li><p>Experience : ${experience}</p></li>
-          <li><p>Social : ${social}</p></li>
-          <li><p>Minimum Spend : ${minspend}</p></li>
-        </ul>
-      `,
-    });
+
+    // Create a transporter object using Gmail SMTP
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+
+// Email options
+
+
+const mailOptions = {
+    to: "info@indiadesignershow.com",
+    from: process.env.EMAIL_USER,
+    subject: "IDS Designer Registration",
+    html: `
+      <h3>Designer Details</h3>
+      <ul>
+        <li><p>Name : ${fullname} </p></li>
+        <li><p>Email : ${email}</p></li>
+        <li><p>Phone : ${phone}</p></li>
+        <li><p>Location : ${location}</p></li>
+        <li><p>Experience : ${experience}</p></li>
+        <li><p>Social : ${social}</p></li>
+        <li><p>Minimum Spend : ${minspend}</p></li>
+      </ul>
+    `,
+  }
+
+// Send the email
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    console.error('❌ Error:', error.message);
+  } else {
+    console.log('✅ Email sent:', info.response);
+  }
+});
+
+    // Set up email transporter
+    // let transporter = nodemailer.createTransport({
+    //   host: "smtp-relay.brevo.com",
+    //   port: 587,
+    //   secure: false,
+    //   auth: {
+    //     user: process.env.BREEVO_ID,
+    //     pass: process.env.BREEVO_PASS,
+    //   },
+    // });
+
+    // let info = await transporter.sendMail({
+    //   to: "info@indiadesignershow.com",
+    //   from: "info@indiadesignershow.com",
+    //   subject: "IDS Designer Registration",
+    //   html: `
+    //     <h3>Designer Details</h3>
+    //     <ul>
+    //       <li><p>Name : ${fullname} </p></li>
+    //       <li><p>Email : ${email}</p></li>
+    //       <li><p>Phone : ${phone}</p></li>
+    //       <li><p>Location : ${location}</p></li>
+    //       <li><p>Experience : ${experience}</p></li>
+    //       <li><p>Social : ${social}</p></li>
+    //       <li><p>Minimum Spend : ${minspend}</p></li>
+    //     </ul>
+    //   `,
+    // });
 
     res.status(201).json({ message: "Designer registered successfully" });
   } catch (error) {
