@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 const Brand = require("../models/brand");
 const {nanoid} = require("nanoid")
-const nodemailer = require("nodemailer");
+
 
 
 //const nanoid = require("nanoid");
