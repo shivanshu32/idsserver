@@ -171,19 +171,27 @@ exports.passRegister = async (req, res) => {
       const finaltotalprice = 0
       const finalcost = 0
       const finalpassid = "FR" + merchanttxnid
+      const finalshowid = showid
+      const finalmerchanttxnid = merchanttxnid
+      const finalname = name
+      const finalemail = email
+      const finalphone = phone
+      const finaloccupation = occupation
       
       const passmasterdata = new Passmaster({
-      
-        showid,
-        merchanttxnid ,
+
+
+        finalshowid,
+        finalmerchanttxnid ,
         finalquantity ,
         finaltotalprice ,
         finalcost ,
-        name ,
-        email ,
-        phone ,
-        occupation,
+        finalname ,
+        finalemail ,
+        finalphone ,
+        finaloccupation,
         finalpassid
+        
         })
 
         passmasterdata.save()
