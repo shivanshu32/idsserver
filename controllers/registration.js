@@ -199,6 +199,8 @@ exports.passRegister = async (req, res) => {
           const topassurl = "https://www.indiadesignershow.com/Epass/" + merchanttxnid
           sendpassmail(topassurl,email)
 
+          res.status(201).json({ message: merchanttxnid });
+
         })
     }
 
