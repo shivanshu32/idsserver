@@ -43,6 +43,19 @@ const bookpassSchema = new mongoose.Schema({
         type: String,
         default: "init"
       }, 
+      followus: {
+        type: String,
+        required: true
+      }, 
+      instagramid: {
+        type: String,
+        required: true
+      }, 
+      resharelink: {
+        type: String,
+        required: false
+      }, 
+  
    
 });
 

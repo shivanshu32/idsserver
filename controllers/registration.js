@@ -28,7 +28,10 @@ exports.passRegister = async (req, res) => {
     occupation,
     showid,
     quantity,
-    price
+    price,
+    followus,
+    instagramid,
+    resharelink
   } = req.body;
 
   try {
@@ -50,7 +53,10 @@ exports.passRegister = async (req, res) => {
     showid,
     merchanttxnid,
     quantity,
-    price 
+    price,
+    followus,
+    instagramid,
+    resharelink
   });
 
   await newPass.save();
