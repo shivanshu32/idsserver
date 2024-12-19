@@ -14,6 +14,7 @@ const nodemailer = require("nodemailer");
 const Passregister = require("../models/bookpass")
 const Passmaster = require("../models/passmaster")
 
+
 //f22
 //a4
 //v9  == 35
@@ -165,6 +166,7 @@ exports.passRegister = async (req, res) => {
     }
     else
     {
+      console.log("show is not vip")
       const finalquantity = 1
       const finaltotalprice = 0
       const finalcost = 0
